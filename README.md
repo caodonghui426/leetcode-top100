@@ -34,7 +34,7 @@
 
 #### 题解：
 
-1. 两层for循环进行遍历，复杂度为 $O(N^2)$
+1. 两层for循环进行遍历，复杂度为 $$O(N^2)$$
 
 ```go
 func twoSum(nums []int, target int) []int {
@@ -42,14 +42,14 @@ func twoSum(nums []int, target int) []int {
 		for j := i + 1; j < len(nums); j++ {
 			if nums[i] + nums[j] == target {
 				return []int{i, j}
-            }           
-        }   
-    }
+            		}           
+        	}   
+    	}
 	return nil
 }
 ```
 
-2. 使用哈希表，寻找是否存在target - x，复杂度为 $O(N)$
+2. 使用哈希表，寻找是否存在target - x，复杂度为 $$O(N)$$
 
 ```go
 func twoSum(nums []int, target int) []int {
@@ -243,5 +243,77 @@ func moveZeroes(nums []int) {
 			a += 1
 		}
 	}
+}
+```
+
+### Q11. 盛最多水的容器
+
+#### 题目描述
+
+给定一个长度为 `n` 的整数数组 `height` 。有 `n` 条垂线，第 `i` 条线的两个端点是 `(i, 0)` 和 `(i, height[i])` 。
+
+找出其中的两条线，使得它们与 `x` 轴共同构成的容器可以容纳最多的水。
+
+返回容器可以储存的最大水量。
+
+**说明：**你不能倾斜容器。
+
+**示例 1：**
+
+![](https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/07/25/question\_11.jpg)
+
+<pre><code><strong>输入：[1,8,6,2,5,4,8,3,7]
+</strong><strong>输出：49 
+</strong><strong>解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
+</strong></code></pre>
+
+**示例 2：**
+
+<pre><code><strong>输入：height = [1,1]
+</strong><strong>输出：1
+</strong></code></pre>
+
+**提示：**
+
+* `n == height.length`
+* `2 <= n <= 105`
+* `0 <= height[i] <= 104`
+
+#### 题解
+
+要想盛最多的水，那么就要尽可能的保证height足够高，宽足够大。所以可以先从两边开始，使用双指针指向两端，然后计算当前面积，然后如果左边height比较小，就移动左边的，如果右边比较小就移动右边的，直至相遇。
+
+这里面的逻辑就是移动最小的，保留更大的有可能在后面会增大面积，这是一种贪心思想。
+
+```go
+func maxArea(height []int) int {
+    left, right := 0, len(height)-1
+    maxArea := 0
+    for left < right {
+       currentArea := min(height[left], height[right]) * (right - left)
+       maxArea = max(maxArea, currentArea)
+       if height[left] < height[right] {
+          left++
+       } else {
+          right--
+       }
+    }
+    return maxArea
+}
+
+func max(a, b int) int {
+    if a > b {
+       return a
+    } else {
+       return b
+    }
+}
+
+func min(a, b int) int {
+    if a < b {
+       return a
+    } else {
+       return b
+    }
 }
 ```
