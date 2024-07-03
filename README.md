@@ -317,3 +317,117 @@ func min(a, b int) int {
     }
 }
 ```
+
+### Q15. 三叔之和
+
+#### 题目描述：
+
+给你一个整数数组 `nums` ，判断是否存在三元组 `[nums[i], nums[j], nums[k]]` 满足 `i != j`、`i != k` 且 `j != k` ，同时还满足 `nums[i] + nums[j] + nums[k] == 0` 。请
+
+你返回所有和为 `0` 且不重复的三元组。
+
+**注意：**答案中不可以包含重复的三元组。
+
+**示例 1：**
+
+<pre><code><strong>输入：nums = [-1,0,1,2,-1,-4]
+</strong><strong>输出：[[-1,-1,2],[-1,0,1]]
+</strong><strong>解释：
+</strong>nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0 。
+nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0 。
+nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0 。
+不同的三元组是 [-1,0,1] 和 [-1,-1,2] 。
+注意，输出的顺序和三元组的顺序并不重要。
+</code></pre>
+
+**示例 2：**
+
+<pre><code><strong>输入：nums = [0,1,1]
+</strong><strong>输出：[]
+</strong><strong>解释：唯一可能的三元组和不为 0 。
+</strong></code></pre>
+
+**示例 3：**
+
+<pre><code><strong>输入：nums = [0,0,0]
+</strong><strong>输出：[[0,0,0]]
+</strong><strong>解释：唯一可能的三元组和为 0 。
+</strong></code></pre>
+
+#### 题解：
+
+1. 暴力：
+
+这个思路没问题，但是会超时。思想就是先进行排序，时间复杂度是 $O(nlogn)$，然后进行全部的遍历，时间复杂度是$O(N^3)$。
+
+这里需要注意的是排除可能重复的组合，即如果当前一个元素和上一个元素值一样，跳过。
+
+```go
+func threeSum(nums []int) [][]int {
+	sort.Ints(nums)
+	result := make([][]int, 0)
+	for i := 0; i < len(nums)-2; i++ {
+		if i > 0 && nums[i] == nums[i-1] {
+			continue
+		}
+		for j := i + 1; j < len(nums)-1; j++ {
+			if j > i+1 && nums[j] == nums[j-1] {
+				continue
+			}
+			for k := j + 1; k < len(nums); k++ {
+				if k > j+1 && nums[k] == nums[k-1] {
+					continue
+				}
+				if nums[i]+nums[j]+nums[k] == 0 {
+					result = append(result, []int{nums[i], nums[j], nums[k]})
+				}
+			}
+		}
+	}
+	return result
+}
+```
+
+2. 双指针
+
+在最外层循环中与第一种解法保持一致，然后对于后两个数的选择，使用左右指针指向两边，不断向中间靠拢。
+
+如果找到了，就缩小范围，left++，right--，同时减少可能存在的重复组合。
+
+如果sum < 0， left++
+
+如果sum > 0，right--
+
+所以整体时间复杂度为$O(N^2)$&#x20;
+
+```go
+func threeSum(nums []int) [][]int {
+	sort.Ints(nums)
+	result := make([][]int, 0)
+	for i := 0; i < len(nums)-2; i++ {
+		if i > 0 && nums[i] == nums[i-1] {
+			continue
+		}
+		left, right := i+1, len(nums)-1
+		for left < right {
+			sum := nums[i] + nums[left] + nums[right]
+			if sum == 0 {
+				result = append(result, []int{nums[i], nums[left], nums[right]})
+				left++
+				right--
+				for left < right && nums[left] == nums[left-1] {
+					left++
+				}
+				for left < right && nums[right] == nums[right+1] {
+					right--
+				}
+			} else if sum < 0 {
+				left++
+			} else {
+				right--
+			}
+		}
+	}
+	return result
+}
+```
